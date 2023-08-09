@@ -47,7 +47,7 @@ router.post('/login', async (req, res) => {
 
     res.cookie('token', token, { httpOnly: true });
 
-    res.send(user);
+    res.send({ user });
   } catch (err) {
     console.log(err);
     res.status(401).send({
@@ -70,12 +70,16 @@ router.get('/authenticated', async (req, res) => {
 
     res.send({ user });
   } catch (err) {
-    res.status(401).send({
-      error: true,
-      message: err.message,
+    res.send({
       user: null
     });
   }
+});
+
+// Log out user
+router.get('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.send('Logged out successfully');
 });
 
 // Note routes

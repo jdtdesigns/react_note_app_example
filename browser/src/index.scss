@@ -62,15 +62,22 @@ header {
   padding: 6px 3%;
   color: #fff;
   margin-bottom: 35px;
-  nav a {
-    color: #fff;
-    text-decoration: none;
-    &:not(:last-child) {
-      margin-right: 5px;
+  nav {
+    p.header-username {
+      margin-right: 15px;
     }
-    &.active {
-      text-decoration: underline;
-    }
+    a {
+        color: #fff;
+        text-decoration: none;
+    
+        &:not(:last-child) {
+          margin-right: 5px;
+        }
+    
+        &.active {
+          text-decoration: underline;
+        }
+      }
   }
 }
 
@@ -78,7 +85,7 @@ main {
   padding: 0 3%;
 }
 
-.landing {
+.landing, .dashboard {
   h1, h3 {
     margin-bottom: 25px;
   }
@@ -87,6 +94,11 @@ main {
 form {
   width: 400px;
   margin: 20px auto 0;
+  p.error-message {
+    text-align: center;
+    margin-bottom: 10px;
+    color: red;
+  }
   input, button {
     padding: 5px 10px;
     margin-bottom: 5px;
