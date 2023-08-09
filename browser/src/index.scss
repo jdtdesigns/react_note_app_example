@@ -94,6 +94,12 @@ main {
 form {
   width: 400px;
   margin: 20px auto 0;
+  &.dashboard-form {
+    margin-bottom: 25px;
+    h2 {
+      margin-bottom: 15px;
+    }
+  }
   p.error-message {
     text-align: center;
     margin-bottom: 10px;
@@ -109,5 +115,18 @@ form {
     font-size: .98rem;
     background: #1ddd85;
     color: #fff;
+  }
+}
+
+.notes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  .note {
+    padding: 10px;
+    border: 1px solid #333;
+    p {
+      margin: 4px 0;
+    }
   }
 }
