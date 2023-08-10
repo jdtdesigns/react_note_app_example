@@ -1,15 +1,8 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 
-function Landing(props) {
+
+function Landing() {
   const [notes, setNotes] = useState([]);
-
-  useEffect(() => {
-    axios.get('/api/notes')
-      .then(res => {
-        setNotes([...res.data.notes]);
-      });
-  }, []);
 
   return (
     <main className="landing">

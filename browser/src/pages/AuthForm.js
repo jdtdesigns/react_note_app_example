@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { gql, useMutation } from '@apollo/client';
+
+import { useStore } from '../store';
 
 const styles = {
   toggleWrap: {
@@ -14,7 +16,40 @@ const styles = {
   }
 };
 
-function AuthForm(props) {
+const LOGIN_USER = gql`
+  mutation LOGIN_USER($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
+      user {
+        _id
+        username
+        email
+        notes {
+          text
+        }
+      }
+    }
+  }
+`;
+
+const REGISTER_USER = gql`
+  mutation REGISTER_USER($username: String!, $email: String!, $password: String!) {
+    register(username: $username, email: $email, password: $password) {
+      user {
+        _id
+        username
+        email
+        notes {
+          text
+        }
+      }
+    }
+  }
+`;
+
+function AuthForm() {
+  const [loginUser] = useMutation(LOGIN_USER);
+  const [registerUser] = useMutation(REGISTER_USER);
+  const { dispatch, actions } = useStore();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -44,17 +79,18 @@ function AuthForm(props) {
   const handleSubmit = async e => {
     e.preventDefault();
 
-    const url = formData.isLogin ? '/api/login' : '/api/register';
+    const authMethod = formData.isLogin ? loginUser : registerUser;
 
     try {
-      const res = await axios.post(url, formData);
-
-      props.setState((oldState) => {
-        return {
-          ...oldState,
-          user: res.data.user
-        }
+      const data = await authMethod({
+        variables: formData
       });
+
+      console.log(data);
+      // dispatch({
+      //   type: actions.UPDATE_USER,
+      //   payload: res.data.user
+      // });
       setErrorMessage('');
       setFormData({
         username: '',
@@ -63,9 +99,10 @@ function AuthForm(props) {
         isLogin: true
       });
 
-      navigate('/dashboard');
+      // navigate('/dashboard');
     } catch (err) {
-      setErrorMessage(err.response.data.message);
+      console.log(err);
+      // setErrorMessage(err.response.data.message);
     }
   };
 

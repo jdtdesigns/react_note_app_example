@@ -1,18 +1,20 @@
 import { NavLink } from 'react-router-dom';
 import axios from 'axios';
 
-function Header(props) {
+import { useStore } from '../store';
+
+function Header() {
+  const { dispatch, actions, user } = useStore();
+
   const logout = async e => {
     e.preventDefault();
 
     await axios.get('/api/logout');
 
-    props.setState((oldState) => {
-      return {
-        ...oldState,
-        user: null
-      }
-    })
+    dispatch({
+      type: actions.UPDATE_USER,
+      payload: null
+    });
   }
 
   return (
@@ -20,9 +22,9 @@ function Header(props) {
       <h3>Note App</h3>
 
       <nav className="row">
-        {props.state.user && <p className="header-username">Welcome, {props.state.user.username}</p>}
+        {user && <p className="header-username">Welcome, {user.username}</p>}
         <NavLink to="/">Home</NavLink>
-        {props.state.user ? (
+        {user ? (
           <>
             <NavLink to="/dashboard">Dashboard</NavLink>
             <NavLink onClick={logout} to="/logout">Log Out</NavLink>

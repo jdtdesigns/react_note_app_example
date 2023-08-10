@@ -16,4 +16,18 @@ async function validateToken(token) {
   return is_valid;
 }
 
-module.exports = { createToken, validateToken };
+async function authenticate({ req, res }) {
+  try {
+    const token = req.cookies.token;
+
+    if (!token) return {};
+
+    const { user_id } = await validateToken(token);
+
+    return { user_id, res };
+  } catch (err) {
+    return {};
+  }
+}
+
+module.exports = { createToken, validateToken, authenticate };

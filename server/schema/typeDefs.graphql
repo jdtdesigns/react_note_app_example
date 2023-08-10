@@ -1,0 +1,30 @@
+type Note {
+  _id: ID
+  text: String
+  author: User
+}
+
+type User {
+  _id: ID
+  username: String
+  email: String
+  notes: [Note]
+  createdAt: String
+}
+
+type AuthResponse {
+  user: User
+  error: Boolean
+  message: String
+}
+
+type Query {
+  authenticate: AuthResponse
+  getNotes: [Note]
+}
+
+type Mutation {
+  register(username: String!, email: String!, password: String!): AuthResponse
+  login(email: String!, password: String!): AuthResponse
+  createNote(text: String!): AuthResponse
+}

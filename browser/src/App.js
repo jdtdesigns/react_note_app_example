@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import axios from 'axios';
+import { gql, useQuery } from '@apollo/client';
+
+import { useStore } from './store';
 
 // components
 import Loading from './components/Loading';
@@ -13,42 +15,56 @@ import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
 
+const AUTHENTICATE = gql`
+  query {
+    authenticate {
+      user {
+        _id
+        username
+        email
+        notes {
+          text
+        }
+      }
+    }
+  }
+`;
+
 function App() {
-  const [state, setState] = useState({
-    user: null,
-    notes: [],
-    loading: true
-  });
+  const { dispatch, actions, loading } = useStore();
+  const { data, loading: qLoading } = useQuery(AUTHENTICATE);
+
+  if (!qLoading) console.log('yep');
 
   useEffect(() => {
-    axios.get('/api/authenticated')
-      .then(res => {
-        setState({
-          ...state,
-          user: res.data.user,
-          loading: false
-        });
+
+
+    if (data) {
+      dispatch({
+        type: actions.UPDATE_USER,
+        payload: data.authenticate.user
       });
-  }, []);
+    }
+  }, [data, qLoading]);
 
   return (
     <>
-      <Header state={state} setState={setState} />
+      <Header />
 
-      {state.loading && <Loading />}
+      {loading && <Loading />}
 
       <Routes>
         <Route path="/" element={<Landing />} />
 
         <Route path="/auth" element={(
-          <Redirect user={state.user}>
-            <AuthForm setState={setState} />
+          <Redirect>
+            <AuthForm />
           </Redirect>
         )} />
 
         <Route path="/dashboard" element={(
-          <Redirect user={state.user}>
-            <Dashboard state={state} setState={setState} />
+          <Redirect>
+            <Dashboard />
           </Redirect>
         )} />
 

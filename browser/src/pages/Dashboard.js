@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-function Dashboard(props) {
+import { useStore } from '../store';
+
+function Dashboard() {
+  const { dispatch, actions, user } = useStore();
   const [formData, setFormData] = useState({
     text: ''
   });
@@ -18,10 +21,10 @@ function Dashboard(props) {
 
     const res = await axios.post('/api/note', formData);
 
-    props.setState(oldState => ({
-      ...oldState,
-      user: res.data.user
-    }));
+    dispatch({
+      type: actions.UPDATE_USER,
+      payload: res.data.user
+    });
 
     setFormData({
       text: ''
@@ -30,7 +33,7 @@ function Dashboard(props) {
 
   return (
     <main className="dashboard">
-      <h1 className="text-center">Welcome, {props.state.user.username}!</h1>
+      <h1 className="text-center">Welcome, {user.username}!</h1>
 
       <form onSubmit={handleSubmit} className="column dashboard-form">
         <h2 className="text-center">Create a Note</h2>
@@ -41,9 +44,9 @@ function Dashboard(props) {
       <h3>Here are your saved notes:</h3>
 
       <div className="notes">
-        {!props.state.user.notes.length && <p>No notes have been added.</p>}
+        {!user.notes.length && <p>No notes have been added.</p>}
 
-        {props.state.user.notes.map(note => (
+        {user.notes.map(note => (
           <div key={note._id} className="note column">
             <h3>{note.text}</h3>
             <div className="column">
