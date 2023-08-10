@@ -28,7 +28,6 @@ function Dashboard(props) {
     });
   }
 
-
   return (
     <main className="dashboard">
       <h1 className="text-center">Welcome, {props.state.user.username}!</h1>
