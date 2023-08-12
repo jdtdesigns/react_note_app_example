@@ -1,12 +1,20 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { redirect } from 'react-router-dom';
+import { useMutation } from '@apollo/client';
+import { useStore } from '../../store';
+import dayjs from 'dayjs';
 
-import { useStore } from '../store';
+import { CREATE_NOTE } from './mutations';
+import { AUTHENTICATE } from '../../App/queries';
 
 function Dashboard() {
-  const { dispatch, actions, user } = useStore();
+  const { user } = useStore();
   const [formData, setFormData] = useState({
     text: ''
+  });
+  const [createNote] = useMutation(CREATE_NOTE, {
+    // We refetch the user again, to get the updated user's notes, which triggers the html below to reload and show the newly added note
+    refetchQueries: [AUTHENTICATE]
   });
 
   const handleInputChange = e => {
@@ -19,16 +27,20 @@ function Dashboard() {
   const handleSubmit = async e => {
     e.preventDefault();
 
-    const res = await axios.post('/api/note', formData);
+    try {
+      // We trigger the createNote mutation and make sure to wait for it to finish processing. This will ensure that our refetch to AUTHENTICATE waits until the user has been updated on the backend.
+      await createNote({
+        variables: formData
+      });
 
-    dispatch({
-      type: actions.UPDATE_USER,
-      payload: res.data.user
-    });
-
-    setFormData({
-      text: ''
-    });
+      // Clear the form for the next note
+      setFormData({
+        text: ''
+      });
+    } catch (err) {
+      console.log(err);
+      redirect('/auth');
+    }
   }
 
   return (
@@ -50,7 +62,7 @@ function Dashboard() {
           <div key={note._id} className="note column">
             <h3>{note.text}</h3>
             <div className="column">
-              <p>Added On: {note.createdAt}</p>
+              <p>Added On: {dayjs(+note.createdAt).format('MM/DD/YYYY')}</p>
             </div>
           </div>
         ))}

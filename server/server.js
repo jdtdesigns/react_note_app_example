@@ -18,8 +18,6 @@ const is_prod = process.env.PORT;
 
 const { typeDefs, resolvers } = require('./schema');
 
-
-
 async function startServer() {
   const server = new ApolloServer({
     typeDefs,
@@ -29,7 +27,6 @@ async function startServer() {
 
   await server.start();
 
-
   // Load middleware
   if (is_prod) {
     app.use(express.static(path.join(__dirname, '../browser/build')));
@@ -38,7 +35,11 @@ async function startServer() {
   app.use(express.json());
   // Add additional cookie tools to the route request object
   app.use(cookieParser());
-  app.use(cors());
+  app.use(cors({
+    credentials: true,
+    origin: ['http://localhost:3000']
+  }));
+
   app.use(expressMiddleware(server, {
     context: authenticate,
   }));

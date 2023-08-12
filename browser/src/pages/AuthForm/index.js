@@ -1,50 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 
-import { useStore } from '../store';
+import { useStore } from '../../store';
 
-const styles = {
-  toggleWrap: {
-    marginTop: '15px'
-  },
-  label: {
-    marginRight: '3px'
-  },
-  input: {
-    marginRight: '10px'
-  }
-};
+import { styles } from './styles';
 
-const LOGIN_USER = gql`
-  mutation LOGIN_USER($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      user {
-        _id
-        username
-        email
-        notes {
-          text
-        }
-      }
-    }
-  }
-`;
-
-const REGISTER_USER = gql`
-  mutation REGISTER_USER($username: String!, $email: String!, $password: String!) {
-    register(username: $username, email: $email, password: $password) {
-      user {
-        _id
-        username
-        email
-        notes {
-          text
-        }
-      }
-    }
-  }
-`;
+import { LOGIN_USER, REGISTER_USER } from './mutations';
 
 function AuthForm() {
   const [loginUser] = useMutation(LOGIN_USER);
@@ -79,18 +41,19 @@ function AuthForm() {
   const handleSubmit = async e => {
     e.preventDefault();
 
-    const authMethod = formData.isLogin ? loginUser : registerUser;
+    // Pick the mutation function from useMutation
+    const authFunction = formData.isLogin ? loginUser : registerUser;
 
     try {
-      const data = await authMethod({
+      const { data } = await authFunction({
         variables: formData
       });
 
-      console.log(data);
-      // dispatch({
-      //   type: actions.UPDATE_USER,
-      //   payload: res.data.user
-      // });
+      dispatch({
+        type: actions.UPDATE_USER,
+        payload: data.login.user
+      });
+
       setErrorMessage('');
       setFormData({
         username: '',
@@ -99,10 +62,9 @@ function AuthForm() {
         isLogin: true
       });
 
-      // navigate('/dashboard');
+      navigate('/dashboard');
     } catch (err) {
-      console.log(err);
-      // setErrorMessage(err.response.data.message);
+      setErrorMessage(err.message);
     }
   };
 
